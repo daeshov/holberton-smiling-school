@@ -81,7 +81,6 @@ function createPopularSlide(video) {
   $(document).ready(function () {
     const carouselInner = $('.popular .carousel-inner');
     const loader = $('.loader');
-  
     // to fetch and render the data
     function populartutorials() {
         const inner = $('.popular .carousel-inner');
