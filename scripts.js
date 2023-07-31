@@ -44,6 +44,7 @@ $(document).ready(function () {
       }
   });
 });
+// task 2
 
 function createPopularSlide(video) {
     const { thumb_url, title, 'sub-title': subTitle, duration, author_pic_url, author } = video;
@@ -117,4 +118,76 @@ function createPopularSlide(video) {
         });
          } 
             populartutorials();
+});
+// task 3
+
+function createLatestSlide(video) {
+    const { thumb_url, title, 'sub-title': subTitle, duration, author_pic_url, author } = video;
+  
+    const videoCard = $('<div>').addClass('card-video-group h-100');
+    const thumbnailContainer = $('<div>').addClass('position-relative').appendTo(videoCard);
+    $('<img>').attr({
+        'src': thumb_url,
+        'alt': 'Video Thumbnail'
+    }).addClass('card-img-top').appendTo(thumbnailContainer);
+    $('<img>').attr({
+        'src': 'images/play.png',
+        'alt': 'Play Button'
+    }).addClass('rounded-circle mr-2 play-overlay position-absolute').appendTo(thumbnailContainer);
+    const cardBody = $('<div>').addClass('card-body').appendTo(videoCard);
+    $('<h4>').addClass('card-title').text(title).appendTo(cardBody);
+    $('<h5>').addClass('card-subtitle mb-2 text-muted').text(subTitle).appendTo(cardBody);
+    const avatarcontainer = $('<div>').addClass('d-flex align-items-center').appendTo(cardBody);
+    $('<img>').attr({
+        'src': author_pic_url,
+        'alt': 'Avatar'
+    }).addClass('rounded-circle mr-2 avatar').appendTo(avatarcontainer);
+    $('<p>').addClass('mb-0').text(author).appendTo(avatarcontainer);
+    const metadatacontainer = $('<div>').addClass('d-flex justify-content-between mt-2').appendTo(cardBody);
+    const starRating = $('<div>').addClass('star-rating').appendTo(metadatacontainer);
+    $('<img>').attr({
+        'src': 'images/star_on.png',
+        'alt': 'Star On'
+    }).appendTo(starRating);
+    $('<p>').addClass('mb-0').text(duration).appendTo(metadatacontainer);
+
+    return videoCard;
+  }
+
+  $(document).ready(function () {
+    const carouselInner = $('.Latest .carousel-inner');
+    const loader = $('.loader');
+    // to fetch and render the data
+    function Latestvideos() {
+        loader.show();
+        
+      $.ajax({
+            url: 'https://smileschool-api.hbtn.info/latest-videos',
+            type: 'GET',
+            success: function (videos) {
+                loader.hide();
+                carouselInner.empty();
+                
+                for (let i = 0; i < videos.length; i += 4)  {
+                    const videoGroup = $('<div>').addClass('carousel-item');
+                    if (i === 0) {
+                     videoGroup.addClass('active');
+                    }
+                    const row = $('<div>').addClass('row').appendTo(videoGroup);
+                    for (let j = i; j < i + 4 && j < videos.length; j++) {
+                        const videoCard = createPopularSlide(videos[j]);
+                        videoCard.addClass('col-12 col-sm-6 col-lg-3'); // Adjust as needed
+                        row.append(videoCard);
+                    }
+                    carouselInner.append(videoGroup);
+                }
+             },
+
+            error: function (error) {
+                loader.hide();
+                console.error('Error:', error);
+            }
+        });
+         } 
+            Latestvideos();
 });
