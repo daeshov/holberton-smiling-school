@@ -191,3 +191,100 @@ function createLatestSlide(video) {
          } 
             Latestvideos();
 });
+
+// task 5
+
+$(document).ready(function () {
+    let searchValue = '';
+    let topic = '';
+    let sortBy = '';
+
+    // Function to fetch courses based on filters and update the video cards
+    function fetchCourses() {
+        // Display the loader while fetching data
+        $(".loader ").show();
+        $(".courses").empty();
+
+        // API request to fetch courses
+        $.ajax({
+            url: "https://smileschool-api.hbtn.info/courses",
+            data: { q: searchValue, topic: topic, sort: sortBy },
+            method: "GET",
+            success: function (data) {
+                // Hide the loader after successful response
+                $(".loader").hide();
+
+                // Process the API response and update the video cards
+                if (data.courses.length > 0) {
+                    // Update the courses section with new video cards
+                    for (const course of data.courses) {
+                        // Create and append video card HTML using the course data
+                        const cardHTML = `<div class="card">
+                                            <!-- Add video card content here -->
+                                          </div>`;
+                        $(".courses").append(cardHTML);
+
+                    }
+                } else {
+                    // Handle the case when no courses are found
+                    $(".courses").html("<p>No courses found.</p>");
+                }
+            },
+            error: function () {
+                // Hide the loader on error and display an error message
+                $(".loader").hide();
+                $(".courses").html("<p>Error loading courses.</p>");
+            },
+        });
+    }
+
+    // Function to update the courses when filters change
+    function updateCourses() {
+        fetchCourses();
+    }
+
+    // Function to initialize dropdowns with data from the API response
+    function initializeDropdowns(data) {
+        // Initialize the Topic dropdown
+        // Loop through data.topics and create options for the dropdown
+        for (const topic of data.topics) {
+            // Append options to the Topic dropdown
+        }
+
+        // Initialize the Sort By dropdown
+        // Loop through data.sorts and create options for the dropdown
+        for (const sortOption of data.sorts) {
+            // Append options to the Sort By dropdown
+        }
+
+        // Add event listeners to the dropdowns to update courses on change
+        // For Topic dropdown
+        // For Sort By dropdown
+    }
+
+    // Function to fetch initial data and populate dropdowns
+    function initializePage() {
+        // Fetch initial data and populate dropdowns
+        $.ajax({
+            url: "https://smileschool-api.hbtn.info/courses",
+            method: "GET",
+            success: function (data) {
+                // Initialize and populate dropdowns with data
+                initializeDropdowns(data);
+
+                // Initialize search value with the data from the API response
+                searchValue = data.keywords;
+
+                // Fetch courses with initial filters
+                fetchCourses();
+            },
+            error: function () {
+                // Handle errors while fetching initial data
+                console.error("Error fetching initial data.");
+            },
+        });
+    }
+
+    // Call the initializePage function on page load
+    initializePage();
+});
