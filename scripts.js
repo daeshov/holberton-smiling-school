@@ -175,8 +175,8 @@ function createLatestSlide(video) {
                     }
                     const row = $('<div>').addClass('row').appendTo(videoGroup);
                     for (let j = i; j < i + 4 && j < videos.length; j++) {
-                        const videoCard = createPopularSlide(videos[j]);
-                        videoCard.addClass('col-12 col-sm-6 col-lg-3'); // Adjust as needed
+                        const videoCard = createLatestSlide(videos[j]);
+                        videoCard.addClass('col-12 col-sm-6 col-lg-3'); 
                         row.append(videoCard);
                     }
                     carouselInner.append(videoGroup);
@@ -191,100 +191,115 @@ function createLatestSlide(video) {
          } 
             Latestvideos();
 });
-
 // task 5
+function createcourses(video) {
+    const { thumb_url, title, 'sub-title': subTitle, duration, author_pic_url, author } = video;
+    // const { topics, sorts, q} = filters;
+    // const topicselect = $('<a>'). addClass('dropdown-menu mt-0').appendTo(filters);
+    // $('<a>'). attr({
+        
+    // })
 
-$(document).ready(function () {
-    let searchValue = '';
-    let topic = '';
-    let sortBy = '';
 
-    // Function to fetch courses based on filters and update the video cards
-    function fetchCourses() {
-        // Display the loader while fetching data
-        $(".loader ").show();
-        $(".courses").empty();
+    const videoCard = $('<div>').addClass('card border-0 col-12 col-sm-6 col-md-3 card-deck');
+    const thumbnailContainer = $('<div>').addClass('card border-0 d-flex flex-column').appendTo(videoCard);
+    $('<img>').attr({
+        'src': thumb_url,
+        'alt': 'Video Thumbnail'
+    }).addClass('card-img-top').appendTo(thumbnailContainer);
+    $('<img>').attr({
+        'src': 'images/play.png',
+        'alt': 'Play Button'
+    }).addClass('rounded-circle mr-2 play-overlay position-absolute').appendTo(thumbnailContainer);
+    const cardBody = $('<div>').addClass('card-body px-2').appendTo(videoCard);
+    $('<h4>').addClass('card-title').text(title).appendTo(cardBody);
+    $('<h5>').addClass('card-subtitle mb-2 text-muted').text(subTitle).appendTo(cardBody);
+    const avatarcontainer = $('<div>').addClass('d-flex align-items-center').appendTo(cardBody);
+    $('<img>').attr({
+        'src': author_pic_url,
+        'alt': 'Avatar'
+    }).addClass('rounded-circle mr-2 avatar').appendTo(avatarcontainer);
+    $('<p>').addClass('mb-0').text(author).appendTo(avatarcontainer);
+    const metadatacontainer = $('<div>').addClass('d-flex justify-content-between mt-2').appendTo(cardBody);
+    const starRating = $('<div>').addClass('star-rating').appendTo(metadatacontainer);
+    $('<img>').attr({
+        'src': 'images/star_on.png',
+        'alt': 'Star On'
+    }).appendTo(starRating);
+    $('<p>').addClass('mb-0').text(duration).appendTo(metadatacontainer);
 
-        // API request to fetch courses
-        $.ajax({
-            url: "https://smileschool-api.hbtn.info/courses",
-            data: { q: searchValue, topic: topic, sort: sortBy },
-            method: "GET",
-            success: function (data) {
-                // Hide the loader after successful response
-                $(".loader").hide();
+    return videoCard;
+  }
+  function newselection(data) {
+	if (data.topics.length > 0) {
+		let topic = data.topics[0].replace(/_/g, ' ');
+		$('.box2 .btn span').text(topic);
+	}
 
-                // Process the API response and update the video cards
-                if (data.courses.length > 0) {
-                    // Update the courses section with new video cards
-                    for (const course of data.courses) {
-                        // Create and append video card HTML using the course data
-                        const cardHTML = `<div class="card">
-                                            <!-- Add video card content here -->
-                                          </div>`;
-                        $(".courses").append(cardHTML);
+	if (data.sorts.length > 0) {
+		let sort = data.sorts[0].replace(/_/g, ' ');
+		$('.box3 .btn span').text(sort);
+	}
+    
+}
 
-                    }
-                } else {
-                    // Handle the case when no courses are found
-                    $(".courses").html("<p>No courses found.</p>");
-                }
-            },
-            error: function () {
-                // Hide the loader on error and display an error message
-                $(".loader").hide();
-                $(".courses").html("<p>Error loading courses.</p>");
-            },
+  function filterselection(courseselector, url, query = '', topic = 'all', sort = 'most_popular') {
+    
+      $.get(url, { q: query, topic: topic, sort: sort}, function (data) {
+        $(courseselector).empty();
+        loader.hide();
+        console.log(`data fetched for ${courseselector}: `, data);
+        $('#keywords').val(data.q);
+        
+        $('.box2 .dropdown-menu').html('');
+        data.topics.forEach(topic => {
+            // topic = topic.replace(/_/g, ' ');
+            $('.box2 .dropdown-menu').append(`<a class="dropdown-item" href="#">${topic}</a>`);
         });
-    }
 
-    // Function to update the courses when filters change
-    function updateCourses() {
-        fetchCourses();
-    }
-
-    // Function to initialize dropdowns with data from the API response
-    function initializeDropdowns(data) {
-        // Initialize the Topic dropdown
-        // Loop through data.topics and create options for the dropdown
-        for (const topic of data.topics) {
-            // Append options to the Topic dropdown
-        }
-
-        // Initialize the Sort By dropdown
-        // Loop through data.sorts and create options for the dropdown
-        for (const sortOption of data.sorts) {
-            // Append options to the Sort By dropdown
-        }
-
-        // Add event listeners to the dropdowns to update courses on change
-        // For Topic dropdown
-        // For Sort By dropdown
-    }
-
-    // Function to fetch initial data and populate dropdowns
-    function initializePage() {
-        // Fetch initial data and populate dropdowns
-        $.ajax({
-            url: "https://smileschool-api.hbtn.info/courses",
-            method: "GET",
-            success: function (data) {
-                // Initialize and populate dropdowns with data
-                initializeDropdowns(data);
-
-                // Initialize search value with the data from the API response
-                searchValue = data.keywords;
-
-                // Fetch courses with initial filters
-                fetchCourses();
-            },
-            error: function () {
-                // Handle errors while fetching initial data
-                console.error("Error fetching initial data.");
-            },
+        $('.box3 .dropdown-menu').html('');
+        data.sorts.forEach(sort => {
+            // sort = sort.replace(/_/g, ' ');
+            $('.box3 .dropdown-menu').append(`<a class="dropdown-item" href="#">${sort}</a>`);
         });
-    }
 
-    // Call the initializePage function on page load
-    initializePage();
-});
+        newselection(data);
+    
+        $('#section-title').html(`<span class="text-muted video-count">${data.courses.length} videos</span>`);
+
+            data.courses.forEach((video) => {
+            const card = createcourses(video);
+            $(courseselector).append(card);       
+        });
+
+        $('.box2 .dropdown-menu'). on('click', function (e) {
+            e.prevenDefault();
+            $('.box2 .btn span').text($(this).text());
+            filterselection('#courses-list', ApiUrl, $('.search-text-area').val(), $(this).text(), $('.box3 .btn span').text());
+        });
+
+        $('.box3 .dropdown-menu'). on('click', function (e) {
+            e.prevenDefault();
+            $('.box3 .btn span').text($(this).text());
+            filterselection('#courses-list', ApiUrl, $('.search-text-area').val(), $(this).text(), $('.box2 .btn span').text());
+        });
+  });
+  
+}
+
+$(function () {
+    console.log("Document is ready");
+  
+    const ApiUrl = "https://smileschool-api.hbtn.info/courses";
+  
+    filterselection('#courses-list', ApiUrl);
+  
+    $.get(ApiUrl, function (data) {
+        newselection(data);
+        filterselection('#courses-list', ApiUrl);
+    });
+
+    $('.search-text-area').on('change', function () {
+      filterselection('#courses-list', ApiUrl, $(this).val(), $('.box2 .btn span').text(), $('.box3 .btn span').text());
+    });
+  });
